@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
+
 class HeroesPage extends StatefulWidget {
   @override
   _HeroesPageState createState() => _HeroesPageState();
 }
-
+String imgUrl ="http://cdn.dota2.com";
 class _HeroesPageState extends State<HeroesPage> {
   @override
   Widget build(BuildContext context) {
@@ -23,9 +25,6 @@ class _HeroesPageState extends State<HeroesPage> {
         body: FutureBuilder(
           future: getJson(),
           builder: (BuildContext context,AsyncSnapshot snapshot){
-            debugPrint('${snapshot.hasData}');
-            if(snapshot.hasData)
-              debugPrint(snapshot.data);
             if(snapshot.data==null){
               return Container(
                 child: Center(
@@ -38,6 +37,12 @@ class _HeroesPageState extends State<HeroesPage> {
                 itemCount: snapshot.data.length,
                 itemBuilder: (context,index){
                   return ListTile(
+                    leading: CircleAvatar(child:CachedNetworkImage(
+                      imageUrl: "http://cdn.dota2.com/apps/dota2/images/heroes/antimage_icon.png",
+                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                          CircularProgressIndicator(value: downloadProgress.progress),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ), ),
                     title: Text("${snapshot.data[index].localizedName}"),
                   );
                 }
@@ -49,10 +54,11 @@ class _HeroesPageState extends State<HeroesPage> {
   }
 }
 Future <List<Heroes>> getJson() async {
-  String apiUrl = "https://api.opendota.com/api/heroes";
+  String apiUrl = "https://api.opendota.com/api/heroStats";
   http.Response response = await http.get(apiUrl);
-  List <dynamic> data = jsonDecode(response.body).toList();
-  List <Heroes> heroes = data.map<Heroes>((data)=>Heroes.fromJson(data)).toList();
-  debugPrint('$heroes');
+  List <dynamic> data = jsonDecode(response.body);
+  List <Heroes> heroes= data.map((e) => Heroes.fromJson(e)).toList();
   return heroes;
 }
+
+
