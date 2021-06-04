@@ -1,6 +1,6 @@
 # dota2_data
 
-A new Flutter application.
+a trial application that provides info about dota 2 game it uses api from dota2api
 
 ## Getting Started
 
